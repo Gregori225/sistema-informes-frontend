@@ -2,7 +2,12 @@ import { useState, useEffect } from "react";
 import { X, Wrench, Package, Send } from "lucide-react";
 import { api } from "../services/api";
 
-export default function NuevoInformeModal({ isOpen, onClose, onCreated }) {
+export default function NuevoInformeModal({
+  isOpen,
+  onClose,
+  onCreated,
+  usuarioActualId,
+}) {
   const [solicitantes, setSolicitantes] = useState([]);
   const [equipos, setEquipos] = useState([]);
   const [herramientas, setHerramientas] = useState([]);
@@ -13,7 +18,7 @@ export default function NuevoInformeModal({ isOpen, onClose, onCreated }) {
   const [formData, setFormData] = useState({
     codigo_informe: `INF-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`,
     solicitante_id: "",
-    usuario_id: 2, // ID del usuario autenticado con rol 'usuario'
+    usuario_id: usuarioActualId || 2, // Vincula automáticamente al usuario que inició sesión
     equipo_id: "",
     descripcion_solicitud: "",
     diagnostico_problema: "",
@@ -26,6 +31,18 @@ export default function NuevoInformeModal({ isOpen, onClose, onCreated }) {
     refaccion_id: "",
     cantidad: 1,
   });
+
+  // Si el usuario autenticado llega después (p. ej. carga asíncrona del contexto),
+  // sincronizamos el usuario_id sin pisar el resto del formulario.
+  useEffect(() => {
+    if (usuarioActualId) {
+      setFormData((prev) =>
+        prev.usuario_id === usuarioActualId
+          ? prev
+          : { ...prev, usuario_id: usuarioActualId },
+      );
+    }
+  }, [usuarioActualId]);
 
   useEffect(() => {
     if (isOpen) {

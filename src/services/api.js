@@ -24,6 +24,13 @@ async function request(endpoint, options = {}) {
 }
 
 export const api = {
+  // Autenticación
+  login: (credentials) =>
+    request("/auth/login", {
+      method: "POST",
+      body: JSON.stringify(credentials),
+    }),
+
   // Informes Técnicos
   getInformes: () => request("/informes"),
   getInformeDetalle: (id) => request(`/informes/${id}`),
